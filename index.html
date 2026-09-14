@@ -5,7 +5,7 @@
 <title>M2 — Cosa fai adesso?</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{width:800px;height:550px;overflow:hidden;font-family:'Segoe UI',Arial,sans-serif;
+body{min-height:100vh;display:flex;justify-content:center;align-items:center;overflow:hidden;font-family:'Segoe UI',Arial,sans-serif;
   background:linear-gradient(135deg,#1a0533 0%,#2d1b4e 60%,#1a1040 100%);color:#fff;user-select:none}
 #header{height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 18px;
   background:rgba(255,255,255,.06);border-bottom:1px solid rgba(255,255,255,.12)}
@@ -60,6 +60,7 @@ body{position:relative}
 </style>
 </head>
 <body>
+<div style="width:800px;height:550px;overflow:hidden;position:relative;flex-shrink:0">
 <div id="startOv">
   <div class="start-icon">⚖️</div>
   <h2>Cosa fai adesso?</h2>
@@ -226,5 +227,6 @@ render();
 function showStart(){document.getElementById('startOv').style.display='flex';}
 function startGame(){document.getElementById('startOv').style.display='none';restart();}
 </script>
+</div>
 </body>
 </html>
