@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<title>M2 — Cosa fai adesso?</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{width:800px;height:550px;overflow:hidden;font-family:'Segoe UI',Arial,sans-serif;
+  background:linear-gradient(135deg,#1a0533 0%,#2d1b4e 60%,#1a1040 100%);color:#fff;user-select:none}
+#header{height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 18px;
+  background:rgba(255,255,255,.06);border-bottom:1px solid rgba(255,255,255,.12)}
+#header h1{font-size:15px;font-weight:700}
+#prog-area{display:flex;gap:6px;align-items:center}
+.prog-dot{width:12px;height:12px;border-radius:50%;background:rgba(255,255,255,.2);transition:background .3s}
+.prog-dot.done{background:#a78bfa}
+.prog-dot.active{background:#fff}
+#score-box{background:rgba(255,255,255,.14);padding:5px 14px;border-radius:20px;font-size:13px;font-weight:700}
+#game-area{height:498px;padding:16px 22px;display:flex;flex-direction:column;gap:12px}
+#scenario-num{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#c4b5fd;margin-bottom:-4px}
+#scenario-box{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:12px;
+  padding:14px 16px;font-size:13.5px;line-height:1.6;flex-shrink:0}
+#scenario-box strong{color:#e9d5ff}
+#options-area{display:flex;flex-direction:column;gap:8px;flex:1}
+.opt{background:rgba(255,255,255,.07);border:2px solid rgba(255,255,255,.18);border-radius:10px;
+  padding:12px 16px;cursor:pointer;font-size:13px;line-height:1.4;
+  transition:background .18s,border-color .18s,transform .12s;display:flex;align-items:flex-start;gap:10px}
+.opt:hover{background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.4);transform:translateX(4px)}
+.opt-letter{font-weight:800;font-size:14px;flex-shrink:0;margin-top:1px;color:#c4b5fd}
+.opt.correct{background:rgba(34,197,94,.2);border-color:#4ade80;pointer-events:none}
+.opt.wrong{background:rgba(239,68,68,.2);border-color:#f87171;pointer-events:none}
+.opt.disabled{pointer-events:none;opacity:.5}
+#feedback-box{background:rgba(0,0,0,.3);border-radius:10px;padding:12px 14px;
+  font-size:12.5px;line-height:1.55;display:none;border-left:3px solid #a78bfa}
+#feedback-box.show{display:block}
+#next-btn{align-self:flex-end;background:#7c3aed;color:#fff;border:none;
+  padding:10px 24px;border-radius:8px;font-size:13px;cursor:pointer;font-weight:600;display:none}
+#next-btn.show{display:block}
+#next-btn:hover{background:#6d28d9}
+#ov{display:none;position:absolute;inset:0;z-index:100;background:rgba(0,0,0,.88);
+  align-items:center;justify-content:center;flex-direction:column;text-align:center;padding:30px}
+#ov.show{display:flex}
+#ov .em{font-size:42px;margin-bottom:10px}
+#ov h2{font-size:22px;margin-bottom:8px}
+#ov .final-score{font-size:32px;font-weight:900;color:#a78bfa;margin:8px 0}
+#ov p{font-size:13px;opacity:.8;max-width:500px;line-height:1.6;margin-bottom:18px}
+.btn{background:#7c3aed;color:#fff;border:none;padding:11px 26px;border-radius:8px;font-size:14px;cursor:pointer;font-weight:600}
+.btn:hover{background:#6d28d9}
+body{position:relative}
+#startOv{position:absolute;inset:0;z-index:50;background:rgba(0,0,0,.85);display:flex;align-items:center;justify-content:center;flex-direction:column;text-align:center;padding:30px}
+#startOv h2{font-size:20px;font-weight:700;color:#fff;margin-bottom:10px}
+#startOv p{font-size:13px;color:rgba(255,255,255,.8);max-width:500px;line-height:1.6;margin-bottom:20px}
+.start-icon{font-size:44px;margin-bottom:12px}
+.start-btn{padding:11px 32px;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;transition:transform .15s}
+.start-btn:hover{transform:translateY(-2px)}
+.btn-rigioca{background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.4);padding:6px 14px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;transition:background .2s}
+.btn-rigioca:hover{background:rgba(255,255,255,.25)}
+.btn-corso{background:#fff;padding:6px 14px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;border:none;transition:background .2s}
+.btn-corso:hover{background:#f0f0f0}
+.hdr-btns{display:flex;gap:8px;align-items:center}
+</style>
+</head>
+<body>
+<div id="startOv">
+  <div class="start-icon">⚖️</div>
+  <h2>Cosa fai adesso?</h2>
+  <p>Leggi ogni situazione lavorativa e scegli la risposta più corretta. 4 scenari reali sui tuoi diritti in presenza di sistemi AI.</p>
+  <button class="start-btn" style="background:#7c3aed;color:#fff" onclick="startGame()">▶ Inizia</button>
+</div>
+<div id="header">
+  <h1>⚖️ M2 — Cosa fai adesso?</h1>
+  <div style="display:flex;align-items:center;gap:14px">
+    <div id="prog-area">
+      <div class="prog-dot active" id="d0"></div>
+      <div class="prog-dot" id="d1"></div>
+      <div class="prog-dot" id="d2"></div>
+      <div class="prog-dot" id="d3"></div>
+    </div>
+    <div id="score-box">Punti: <span id="sc">0</span> / 4</div>
+    <div class="hdr-btns">
+      <button class="btn-rigioca" onclick="showStart()">🔄 Rigioca</button>
+      <button class="btn-corso" style="color:#2d1b4e" onclick="window.close()">Torna al corso</button>
+    </div>
+  </div>
+</div>
+
+<div id="game-area">
+  <div id="scenario-num"></div>
+  <div id="scenario-box"></div>
+  <div id="options-area"></div>
+  <div id="feedback-box"></div>
+  <button id="next-btn" onclick="nextScenario()">Prossima situazione →</button>
+</div>
+
+<div id="ov">
+  <div class="em" id="ov-em">🎯</div>
+  <h2>Fine del gioco!</h2>
+  <div class="final-score"><span id="final-sc">0</span> / 4</div>
+  <p id="ov-msg"></p>
+  <div style="display:flex;gap:10px;justify-content:center">
+    <button class="btn" onclick="showStart()">🔄 Rigioca</button>
+    <button class="btn" style="background:#78909c" onclick="window.close()">Torna al corso</button>
+  </div>
+</div>
+
+<script>
+const scenarios=[
+  {
+    num:"Situazione 1 di 4",
+    text:"Il tuo manager ti comunica che non hai ottenuto la promozione. Come motivazione cita il punteggio insufficiente prodotto dal <strong>sistema di valutazione automatico</strong> aziendale. Non ti sono stati forniti altri dettagli.",
+    opts:[
+      {l:"A",t:"Accetti la decisione: un sistema AI è più oggettivo di un valutatore umano, quindi il risultato è affidabile.",c:false},
+      {l:"B",t:"Invii subito un reclamo formale al Garante Privacy perché ritieni che la tua privacy sia stata violata.",c:false},
+      {l:"C",t:"Chiedi al DPO o all'HR su quali dati si basa il punteggio, se c'è stata una revisione umana effettiva e quali sono i criteri utilizzati.",c:true}
+    ],
+    fb:"✅ <strong>C è la risposta corretta.</strong> Il primo passo è sempre chiedere informazioni, non agire in modo estremo. Hai diritto alla spiegazione ai sensi di GDPR art. 22 e L. 132/2025 — ma prima di ricorrere a canali esterni, usa quelli interni. Il Garante si coinvolge solo se l'azienda non risponde o risponde in modo insoddisfacente."
+  },
+  {
+    num:"Situazione 2 di 4",
+    text:"Hai partecipato a una selezione interna per un nuovo ruolo. Sei stato escluso tramite email automatica, senza motivo. Hai diritto a sapere se nella selezione è stato usato un <strong>sistema AI</strong>?",
+    opts:[
+      {l:"A",t:"No: il diritto all'informazione sui sistemi AI vale solo per i dipendenti già assunti, non per le selezioni interne.",c:false},
+      {l:"B",t:"Sì, ma solo se presenti la richiesta entro 48 ore dalla notifica di esclusione, altrimenti decade.",c:false},
+      {l:"C",t:"Sì: sia i candidati che i dipendenti hanno diritto all'informazione ogni volta che l'AI incide su assunzione, gestione o valutazione, ai sensi della L. 132/2025.",c:true}
+    ],
+    fb:"✅ <strong>C è la risposta corretta.</strong> La Legge 132/2025, art. 11, tutela sia i candidati nelle selezioni sia i dipendenti già in forza. Non esiste un termine di 48 ore: il diritto non decade. Puoi richiedere informazioni in qualsiasi momento dopo aver ricevuto una decisione che ti riguarda."
+  },
+  {
+    num:"Situazione 3 di 4",
+    text:"Il tuo responsabile ha <strong>firmato</strong> la tua valutazione annuale, ma durante la riunione ti dice: <em>\"Ho solo approvato quello che ha prodotto il sistema — i numeri erano chiari\"</em>. La decisione è legittima?",
+    opts:[
+      {l:"A",t:"Sì: è presente la firma di un responsabile umano, quindi la supervisione umana è garantita e la valutazione è valida.",c:false},
+      {l:"B",t:"Dipende dall'esito: se la valutazione è positiva non ci sono problemi, se è negativa puoi contestarla.",c:false},
+      {l:"C",t:"No: una firma apposta senza revisione sostanziale equivale a una decisione esclusivamente automatizzata, che è vietata dalla L. 132/2025 e dai decreti attuativi del giugno 2026.",c:true}
+    ],
+    fb:"✅ <strong>C è la risposta corretta.</strong> La supervisione umana deve essere <em>sostanziale</em>, non formale. Apporre una firma senza esaminare il caso, senza ascoltare il lavoratore e senza ragionare in modo indipendente è equivalente a una decisione automatizzata. I decreti attuativi del 10 giugno 2026 lo chiariscono esplicitamente."
+  },
+  {
+    num:"Situazione 4 di 4",
+    text:"Hai ricevuto una <strong>contestazione disciplinare</strong> avviata automaticamente dal sistema di monitoraggio aziendale, che ha rilevato un'assenza non giustificata nel registro digitale. Il procedimento è valido?",
+    opts:[
+      {l:"A",t:"Sì: il sistema di monitoraggio è approvato dall'azienda e hai ricevuto l'informativa preventiva, quindi il procedimento è regolare.",c:false},
+      {l:"B",t:"No: un procedimento disciplinare non può essere avviato esclusivamente da un sistema automatizzato — serve sempre una valutazione umana prima di procedere.",c:true},
+      {l:"C",t:"Dipende: se l'assenza è effettivamente non giustificata, il procedimento automatico è valido indipendentemente da come è stato avviato.",c:false}
+    ],
+    fb:"✅ <strong>B è la risposta corretta.</strong> Anche se l'azienda ha fornito l'informativa sul sistema di monitoraggio, questo non legittima l'avvio automatico di un procedimento disciplinare. La sanzione disciplinare richiede sempre una valutazione umana della situazione. L'opzione A confonde la liceità del monitoraggio con la liceità della sanzione automatica — sono due cose distinte."
+  }
+];
+
+let current=0,score=0,answered=false;
+
+function render(){
+  const s=scenarios[current];
+  document.getElementById('scenario-num').textContent=s.num;
+  document.getElementById('scenario-box').innerHTML=s.text;
+  const oa=document.getElementById('options-area');
+  oa.innerHTML='';
+  s.opts.forEach((o,i)=>{
+    const d=document.createElement('div');
+    d.className='opt';
+    d.innerHTML=`<span class="opt-letter">${o.l}</span><span>${o.t}</span>`;
+    d.onclick=()=>answer(i);
+    oa.appendChild(d);
+  });
+  document.getElementById('feedback-box').classList.remove('show');
+  document.getElementById('feedback-box').innerHTML='';
+  document.getElementById('next-btn').classList.remove('show');
+  answered=false;
+  updateDots();
+}
+
+function answer(i){
+  if(answered)return;
+  answered=true;
+  const s=scenarios[current];
+  const opts=document.querySelectorAll('.opt');
+  opts.forEach((o,j)=>{
+    if(s.opts[j].c)o.classList.add('correct');
+    else if(j===i&&!s.opts[j].c)o.classList.add('wrong');
+    else o.classList.add('disabled');
+  });
+  if(s.opts[i].c)score++;
+  document.getElementById('sc').textContent=score;
+  const fb=document.getElementById('feedback-box');
+  fb.innerHTML=s.fb;
+  fb.classList.add('show');
+  document.getElementById('next-btn').classList.add('show');
+  if(current===scenarios.length-1){
+    document.getElementById('next-btn').textContent='Vedi risultato →';
+  }
+}
+
+function nextScenario(){
+  current++;
+  if(current>=scenarios.length){showResult();return;}
+  render();
+}
+
+function updateDots(){
+  for(let i=0;i<4;i++){
+    const d=document.getElementById('d'+i);
+    d.className='prog-dot'+(i<current?' done':i===current?' active':'');
+  }
+}
+
+function showResult(){
+  document.getElementById('final-sc').textContent=score;
+  const msgs=['Rileggi il modulo sui diritti del lavoratore — ci sono concetti importanti da approfondire.',
+    'Buona base, ma alcuni casi richiedono più attenzione.',
+    'Molto bene! Conosci i tuoi diritti e sai come esercitarli.',
+    'Perfetto! Hai risposto correttamente a tutte le situazioni.'];
+  const ems=['📖','👍','🌟','🏆'];
+  document.getElementById('ov-msg').textContent=msgs[score];
+  document.getElementById('ov-em').textContent=ems[score];
+  document.getElementById('ov').classList.add('show');
+}
+
+function restart(){
+  current=0;score=0;answered=false;
+  document.getElementById('sc').textContent='0';
+  document.getElementById('ov').classList.remove('show');
+  document.getElementById('next-btn').textContent='Prossima situazione →';
+  render();
+}
+
+render();
+function showStart(){document.getElementById('startOv').style.display='flex';}
+function startGame(){document.getElementById('startOv').style.display='none';restart();}
+</script>
+</body>
+</html>
